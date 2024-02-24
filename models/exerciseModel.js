@@ -24,7 +24,7 @@ const exerciseSchema = new mongoose.Schema({
     difficulty: {
         type: String,
         enum: ['beginner', 'intermediate', 'expert'],
-        default: 'medium'
+        default: 'intermediate'
     },
     category: {
         type: String,

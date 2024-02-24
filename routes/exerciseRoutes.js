@@ -4,15 +4,19 @@ const exerciseController = require('../controllers/exerciseController');
 const authController = require('../controllers/authController');
 const bookmarkController = require('../controllers/bookmarkController');
 
+
+router.use(authController.protect);
+
 router.get('/allExercises', exerciseController.getAllExercises);
-router.get('/exercises', authController.protect, exerciseController.getExercises);
-router.delete('/deleteExercise', exerciseController.deleteExercise);
-router.patch('/updateExercise', authController.protect, exerciseController.updateExercise);
-router.post('/createExercise', authController.protect, authController.restrictTo('owner', 'trainer'), exerciseController.createExercise)
-router.get('/sortExerciseByDifficulty', authController.protect, exerciseController.getExercisesByDifficulty);
-router.get('/Top3Exercises', authController.protect, exerciseController.getTop3Exercises);
-router.post('/bookmarkExercise', authController.protect, bookmarkController.bookmarkExercise);
-router.get('/bookmarkedExercise', authController.protect, bookmarkController.getBookmarkedExercises);
+router.get('/exercises', exerciseController.getExercises);
+router.post('/createExercise', authController.restrictTo('owner', 'trainer'), exerciseController.createExercise);
+router.patch('/updateExercise', authController.restrictTo('owner', 'trainer'), exerciseController.updateExercise);
+router.delete('/deleteExercise', authController.restrictTo('owner', 'trainer'), exerciseController.deleteExercise);
+router.get('/sortExerciseByDifficulty', exerciseController.getExercisesByDifficulty);
+router.get('/Top3Exercises', exerciseController.getTop3Exercises);
+router.post('/bookmarkExercise', bookmarkController.bookmarkExercise);
+router.delete('/undoBookmark', bookmarkController.undoBookmark);
+router.get('/bookmarkedExercise', bookmarkController.getBookmarkedExercises);
 
 
 

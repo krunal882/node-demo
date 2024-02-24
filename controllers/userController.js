@@ -1,18 +1,19 @@
 const User = require('../models/userModel');
 
-// const router = express.Router(); 
+const handleErrorResponse = (res, error, msg) => {
+    console.error(msg, error);
+    res.status(500).json({ error: 'Internal Server Error' });
+};
 
 exports.getAllUsers = async (req, res) => {
     try {
-        // Check if pagination is needed
         if (!req.query.page && !req.query.limit) {
-            // If pagination is not needed, simply fetch all users
             const users = await User.find();
             res.json(users);
         }
     } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error fetching users:';
+        handleErrorResponse(res, error, msg);
     }
 };
 exports.getUser = async (req, res) => {
@@ -20,25 +21,33 @@ exports.getUser = async (req, res) => {
         const { name, email, id, role, age } = req.query;
         const filter = {};
         const allowedParams = ['name', 'email', 'role', 'age'];
-        let users
-        if (!req.query) {
+
+        // Check if req.query is empty
+        if (Object.keys(req.query).length === 0) {
             return res.status(400).json({ error: 'Please provide parameters' });
         }
-        if (req.query.id) {
-            users = await User.findById(req.query.id);
-        }
 
-        allowedParams.forEach(async param => {
-            if (req.query[param]) {
-                filter[param] = req.query[param];
-                users = await User.find(filter);
+        let users;
+
+        // If id is provided, fetch user by id
+        if (id) {
+            users = await User.findById(id);
+        } else {
+            // Iterate over allowedParams and construct filter object
+            for (const param of allowedParams) {
+                if (req.query[param]) {
+                    filter[param] = req.query[param];
+                }
             }
-        });
+
+            // Fetch users based on filter
+            users = await User.find(filter);
+        }
 
         res.json(users);
     } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error fetching users:';
+        handleErrorResponse(res, error, msg);
     }
 };
 
@@ -58,27 +67,26 @@ exports.deleteUser = async function (req, res) {
             }
         });
 
-        // Find users based on the provided parameters
         const users = await User.deleteMany(filter);
 
-        // Check if any users were deleted
         if (users.deletedCount === 0) {
             return res.status(404).json({ error: 'No users found with the provided parameters' });
         }
 
         res.json({ message: 'Users deleted successfully' });
     } catch (error) {
-        console.error('Error deleting users:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error deleting users:';
+        handleErrorResponse(res, error, msg);
+
     }
 };
 
 
 exports.deleteOwner = async function (req, res) {
     try {
-        const { name, email, _id, role } = req.query;
+        const { name, email, _id, role, age } = req.query;
         const filter = {};
-        const allowedParams = ['name', 'email', '_id', 'role'];
+        const allowedParams = ['name', 'email', '_id', 'role', 'age'];
 
         if (Object.keys(req.query).length === 0) {
             return res.status(400).json({ error: 'Please provide parameters of owner' });
@@ -90,27 +98,27 @@ exports.deleteOwner = async function (req, res) {
             }
         });
 
-        // Find users based on the provided parameters
         const owners = await User.deleteOne(filter);
 
-        // Check if any users were deleted
         if (owners.deletedCount === 0) {
             return res.status(404).json({ error: 'No owner found with the provided parameters' });
         }
 
         res.json({ message: 'Owner deleted successfully' });
     } catch (error) {
-        console.error('Error deleting owner:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error deleting owner:';
+        handleErrorResponse(res, error, msg);
+
+
     }
 };
 
 
 exports.deleteTrainer = async function (req, res) {
     try {
-        const { name, email, _id, role } = req.query;
+        const { name, email, _id, role, age } = req.query;
         const filter = {};
-        const allowedParams = ['name', 'email', '_id', 'role'];
+        const allowedParams = ['name', 'email', '_id', 'role', 'age'];
 
         if (Object.keys(req.query).length === 0) {
             return res.status(400).json({ error: 'Please provide parameters of trainer' });
@@ -122,18 +130,17 @@ exports.deleteTrainer = async function (req, res) {
             }
         });
 
-        // Find users based on the provided parameters
         const trainer = await User.deleteOne(filter);
 
-        // Check if any users were deleted
         if (trainer.deletedCount === 0) {
             return res.status(404).json({ error: 'No trainer found with the provided parameters' });
         }
 
         res.json({ message: 'trainer deleted successfully' });
     } catch (error) {
-        console.error('Error deleting trainer:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error deleting trainer:';
+        handleErrorResponse(res, error, msg);
+
     }
 };
 
@@ -173,11 +180,9 @@ exports.updateMe = async (req, res, next) => {
 
 exports.deleteMe = async (req, res, next) => {
     try {
-        // Delete the user by ID
         const deletedUser = await User.findByIdAndDelete(req.user.id);
         console.log(deletedUser);
 
-        // Check if the user was found and deleted
         if (!deletedUser) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -187,8 +192,9 @@ exports.deleteMe = async (req, res, next) => {
             data: null
         });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const msg = 'Error deleting user:';
+        handleErrorResponse(res, error, msg);
+
     }
 };
 
@@ -200,14 +206,12 @@ exports.paginate = async (req, res, next) => {
         const skip = (page - 1) * limit;
 
         try {
-            // Fetch users with pagination
             const users = await User.find()
                 .skip(skip)
                 .limit(limit);
 
             const totalCount = await User.countDocuments();
 
-            // Calculate total pages
             const totalPages = Math.ceil(totalCount / limit);
 
             res.status(200).json({
@@ -218,8 +222,9 @@ exports.paginate = async (req, res, next) => {
                 users
             });
         } catch (error) {
-            console.error('Error fetching users:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            const msg = 'Error fetching user:';
+            handleErrorResponse(res, error, msg);
+            ;
         }
     } else {
         next();

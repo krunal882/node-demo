@@ -3,54 +3,48 @@ html(lang="en")
   head
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Successfully Logged In
+    title Welcome
     style.
       body {
         font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #ff9966, #ff5e62);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
         margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
       }
-
-      .container { 
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
         text-align: center;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-        padding: 40px;
+        padding: 20px;
       }
-
       h1 {
-        font-size: 2.5em;
-        color: #333;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin-bottom: 20px;
+        font-size: 3em;
+        color: #4CAF50; 
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
-
       p {
         font-size: 1.2em;
-        color: #333;
-        margin-bottom: 30px;
+        color: #666;
+        margin-bottom: 20px;
       }
-
-      .logout-btn {
+      .button {
         display: inline-block;
-        padding: 15px 32px;
-        background-color: #007bff;
+        padding: 10px 20px;
+        background-color: #4CAF50;
         color: #fff;
         text-decoration: none;
-        border-radius: 30px;
-        transition: all 0.3s ease;
+        font-size: 1.2em;
+        border-radius: 5px;
+        transition: background-color 0.3s;
       }
-
-      .logout-btn:hover {
-        background-color: #0056b3;
-        color: #fff;
+      .button:hover {
+        background-color: #45a049;
       }
   body
     .container
-      h1 Successfully created account
-      p Welcome! You have successfully created .
+      h1
+        | Welcome Aboard!
+      p Account Created Successfully
+      p Thanks for joining us. We're thrilled to have you as part of our community. Explore our content and feel free to reach out if you have any questions or need assistance.

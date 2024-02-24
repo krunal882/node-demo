@@ -9,7 +9,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const app = express();
 
-app.use(express.json()); //add limit
+app.use(express.json());
 
 
 app.set('view engine', 'pug');
@@ -50,7 +50,7 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/signup', async (req, res) => {
-    await res.status(200).render('signup', 'success');
+    await res.status(200).render('signup');
 })
 
 app.use('/', userRoutes)

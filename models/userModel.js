@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Please provide a valid email']
     },
+    age: {
+        type: Number,
+        required: [true, 'Please, specify your age.'],
+        min: [12, 'you should be at least 12 years old']
+    },
     role: {
         type: String,
         enum: {
@@ -26,15 +31,11 @@ const userSchema = new mongoose.Schema({
         },
         default: 'user'
     },
-    age: {
-        type: Number,
-        required: [true, 'Please, specify your age.'],
-        min: [12, 'you should be at least 12 years old']
-    },
+
     password: {
         type: String,
         required: [true, 'Please provide a password'],
-        minlength: 8,
+        minlength: [7, 'password should be of length 8 or higher'],
         unique: true,
         select: false
     },
@@ -42,7 +43,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please confirm your password'],
         validate: {
-            // This only works on CREATE and SAVE!!!
+            // This only works on create and save
             validator: function (el) {
                 return el === this.password;
             },
@@ -54,23 +55,14 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-    // Only run this function if password was actually modified
     if (!this.isModified('password')) return next();
 
-    // Hash the password with cost of 12
     this.password = await bcrypt.hash(this.password, 12);
     ``
-    // Delete confirmPassword field
     this.confirmPassword = undefined;
     next();
 });
 
-// userSchema.methods.correctPassword = async function (
-//     candidatePassword,
-//     userPassword
-// ) {
-//     return await bcrypt.compare(candidatePassword, userPassword);
-// };
 
 
 userSchema.methods.createPasswordResetToken = function () {
